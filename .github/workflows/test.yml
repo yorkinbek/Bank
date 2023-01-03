@@ -1,6 +1,6 @@
 # This workflow will build a golang project
 
-name: ci_test
+name: Run unit test
 
 on:
   push:
