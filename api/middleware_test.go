@@ -19,10 +19,10 @@ func addAuthorization(
 	authorizationType string,
 	username string,
 	duration time.Duration,
-
 ) {
-	token, err := tokenMaker.CreateToken(username, duration)
+	token, payload, err := tokenMaker.CreateToken(username, duration)
 	require.NoError(t, err)
+	require.NotEmpty(t, payload)
 
 	authorizationHeader := fmt.Sprintf("%s %s", authorizationType, token)
 	request.Header.Set(authorizationHeaderKey, authorizationHeader)
@@ -46,7 +46,6 @@ func TestAuthMiddleware(t *testing.T) {
 		{
 			name: "NoAuthorization",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
@@ -62,7 +61,7 @@ func TestAuthMiddleware(t *testing.T) {
 			},
 		},
 		{
-			name: "UnsupportedAuthorization",
+			name: "InvalidAuthorizationFormat",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, "", "user", time.Minute)
 			},
@@ -86,7 +85,6 @@ func TestAuthMiddleware(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			server := newTestServer(t, nil)
-
 			authPath := "/auth"
 			server.router.GET(
 				authPath,

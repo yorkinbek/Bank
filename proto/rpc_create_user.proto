@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package protobuf;
+
+import "client.proto";
+
+option go_package = "github.com/yorqinbek/simple_bank";
+
+message CreateUserRequest {
+    string usernames = 1;
+    string full_names = 2;
+    string emails = 3;
+    string passwords = 4;
+}
+
+message CreateUserResponse {
+    Users users = 1;
+}
